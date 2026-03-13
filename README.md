@@ -3,7 +3,7 @@
 This project is an End-to-End Machine Learning application that predicts a person's fitness category (A, B, C, or D) based on physical metrics. It uses an **Ensemble Learning** approach to ensure high accuracy and is deployed as an interactive web app.
 
 ## 🚀 Live Demo
-[Insert your Streamlit Cloud Link Here after deployment]
+(https://fitness-performance-ai-nnsukxjt7snt2evbrbahuj.streamlit.app/)
 
 ## 📋 Project Overview
 The goal of this project is to classify body performance using various physical tests like sit-ups, broad jumps, and body fat percentage.
