@@ -3,7 +3,7 @@ import joblib
 import pandas as pd
 
 # تحميل الموديل والميزان
-model = joblib.load('body_performance_model.pkl')
+model = joblib.load('body_performance_model_compressed.pkl')
 scaler = joblib.load('scaler.pkl')
 
 st.set_page_config(page_title="Body Performance AI", layout="wide")
