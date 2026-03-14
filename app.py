@@ -3,105 +3,117 @@ import joblib
 import pandas as pd
 import numpy as np
 
-# 1. إعدادات الصفحة
-st.set_page_config(page_title="Fitness AI Pro", page_icon="💪", layout="wide")
+# 1. إعدادات الصفحة الاحترافية
+st.set_page_config(page_title="Bio-Tech AI | Fitness", page_icon="🤖", layout="wide")
 
-# 2. إضافة CSS مخصص لتغيير الخلفية والخطوط والألوان
+# 2. تصميم CSS متقدم (Neon & High-Tech Look)
 st.markdown("""
     <style>
-    /* تغيير خلفية التطبيق */
+    /* خلفية داكنة بتقنية الـ Glassmorphism */
     .stApp {
-        background: linear-gradient(to right, #1e1e2f, #2d2d44);
-        color: white;
+        background: radial-gradient(circle, #1a1a2e 0%, #0f0f1a 100%);
+        color: #e0e0e0;
     }
-    /* تنسيق كروت المدخلات */
-    .stNumberInput, .stSlider {
-        background-color: rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
-        padding: 10px;
+    
+    /* تنسيق كروت المدخلات لتشبه شاشات المختبر */
+    div[data-baseweb="input"], div[data-baseweb="select"], .stSlider {
+        background: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid #00d4ff !important;
+        border-radius: 10px !important;
+        color: white !important;
     }
-    /* تنسيق زر التحليل */
+
+    /* تأثير النيون على العناوين */
+    h1, h2 {
+        color: #00d4ff;
+        text-shadow: 0 0 10px #00d4ff, 0 0 20px #00d4ff;
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    /* زر التحليل بتصميم "Cyber" */
     div.stButton > button:first-child {
-        background-color: #ff4b4b;
+        background: linear-gradient(45deg, #00d4ff, #005f73);
         color: white;
-        border-radius: 20px;
-        height: 3em;
-        width: 100%;
-        font-weight: bold;
         border: none;
-        transition: 0.3s;
+        border-radius: 5px;
+        padding: 15px 30px;
+        font-size: 20px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        box-shadow: 0 0 15px #00d4ff;
+        width: 100%;
+        transition: 0.5s;
     }
+
     div.stButton > button:first-child:hover {
-        background-color: #ff2b2b;
-        transform: scale(1.02);
+        box-shadow: 0 0 30px #00d4ff;
+        transform: translateY(-2px);
     }
     </style>
     """, unsafe_allow_html=True)
 
-# تحميل الموديل والسكيلر
+# تحميل الملفات
 @st.cache_resource
 def load_assets():
     model = joblib.load('body_performance_model_compressed.pkl')
     scaler = joblib.load('scaler.pkl')
     return model, scaler
 
-model, scaler = load_assets()
+try:
+    model, scaler = load_assets()
+except:
+    st.error("⚠️ فشل في تحميل الموديل. تأكد من أسماء الملفات على GitHub.")
 
-# العنوان الرئيسي
-st.title("🏋️‍♂️ AI Body Performance Analyzer")
-st.markdown("---")
+# --- الواجهة ---
+st.markdown("<h1 style='text-align: center;'>🧬 BIO-METRIC AI ANALYZER</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #888;'>Advanced Machine Learning for Athletic Classification</p>", unsafe_allow_html=True)
 
-# 3. تنظيم المدخلات في أعمدة (Layout)
-col1, col2, col3 = st.columns(3)
+# تقسيم الشاشة لـ 3 أقسام تشبه لوحة التحكم (Dashboard)
+col1, col2, col3 = st.columns([1, 1, 1], gap="large")
 
 with col1:
-    st.subheader("👤 Personal Info")
-    age = st.number_input("Age", 10, 80, 25)
-    gender = st.selectbox("Gender", ["Male", "Female"])
-    height = st.number_input("Height (cm)", 120, 220, 170)
-    weight = st.number_input("Weight (kg)", 30, 200, 70)
+    st.markdown("### 🛠 Core Metrics")
+    age = st.number_input("Biological Age", 10, 80, 25)
+    gender = st.selectbox("Gender Orientation", ["Male", "Female"])
+    height = st.number_input("Stature (cm)", 120.0, 220.0, 175.0)
+    weight = st.number_input("Mass (kg)", 30.0, 200.0, 75.0)
 
 with col2:
-    st.subheader("📊 Measurements")
-    body_fat = st.slider("Body Fat %", 5.0, 50.0, 20.0)
-    diastolic = st.number_input("Diastolic BP", 40, 120, 80)
-    systolic = st.number_input("Systolic BP", 80, 200, 120)
-    grip_force = st.number_input("Grip Force", 0.0, 100.0, 40.0)
+    st.markdown("### 📊 Vital Signs")
+    body_fat = st.slider("Adipose Index (Fat %)", 5.0, 50.0, 18.0)
+    sys_bp = st.number_input("Systolic Pressure", 80, 200, 120)
+    dia_bp = st.number_input("Diastolic Pressure", 40, 120, 80)
+    grip = st.number_input("Neural Grip Force", 0.0, 100.0, 45.0)
 
 with col3:
-    st.subheader("🏃 Performance")
-    sit_ups = st.number_input("Sit-ups Count", 0, 100, 30)
-    broad_jump = st.number_input("Broad Jump (cm)", 0, 300, 180)
-    sit_bend = st.number_input("Sit & Bend forward (cm)", -20.0, 50.0, 15.0)
-    running_400m = st.number_input("400m Run (sec)", 30.0, 200.0, 70.0)
+    st.markdown("### ⚡ Kinetic Tests")
+    sit_ups = st.number_input("Core Stability (Sit-ups)", 0, 100, 40)
+    jump = st.number_input("Explosive Power (Jump cm)", 0, 300, 210)
+    bend = st.number_input("Flexibility Index", -20.0, 50.0, 15.0)
 
-st.markdown("---")
+st.markdown("<br>", unsafe_allow_html=True)
 
-# 4. المعالجة والتوقع
-gender_val = 0 if gender == "Male" else 1
-
-if st.button("🚀 Analyze My Performance"):
-    # تجهيز البيانات بنفس ترتيب التدريب
-    features = np.array([[age, gender_val, height, weight, body_fat, diastolic, 
-                          systolic, grip_force, sit_bend, sit_ups, broad_jump]])
+# تفعيل التحليل
+if st.button("INITIATE NEURAL ANALYSIS"):
+    # تجهيز البيانات
+    g_val = 0 if gender == "Male" else 1
+    input_data = np.array([[age, g_val, height, weight, body_fat, dia_bp, sys_bp, grip, bend, sit_ups, jump]])
     
-    # التحجيم
-    features_scaled = scaler.transform(features)
+    # المعالجة
+    input_scaled = scaler.transform(input_data)
+    prediction = model.predict(input_scaled)[0]
     
-    # التوقع
-    prediction = model.predict(features_scaled)[0]
+    # عرض النتيجة بتصميم تقني
+    st.markdown("---")
+    res_colors = {"A": "#00ffcc", "B": "#00d4ff", "C": "#ffcc00", "D": "#ff4b4b"}
+    final_color = res_colors.get(prediction, "#ffffff")
     
-    # عرض النتيجة بشكل مبهر
-    st.markdown(f"<h2 style='text-align: center;'>Your Fitness Class is:</h2>", unsafe_allow_html=True)
-    
-    # تلوين النتيجة حسب الفئة
-    colors = {"A": "#28a745", "B": "#ffc107", "C": "#fd7e14", "D": "#dc3545"}
-    res_color = colors.get(prediction, "#ffffff")
-    
-    st.markdown(f"<h1 style='text-align: center; color: {res_color}; font-size: 80px;'>{prediction}</h1>", unsafe_allow_html=True)
-    
-    if prediction == "A":
-        st.balloons()
-        st.success("Excellent! You are in peak physical condition.")
-    elif prediction == "B":
-        st.info("Great job! You are above average.")
+    c1, c2, c3 = st.columns([1, 2, 1])
+    with c2:
+        st.markdown(f"""
+            <div style="border: 2px solid {final_color}; padding: 20px; border-radius: 15px; text-align: center; background: rgba(0,0,0,0.3);">
+                <h2 style="color: white; text-shadow: none;">RESULT CLASSIFICATION</h2>
+                <h1 style="font-size: 100px; color: {final_color}; margin: 0;">{prediction}</h1>
+            </div>
+        """, unsafe_allow_html=True)
+        if prediction == "A": st.balloons()
