@@ -2,38 +2,40 @@ import streamlit as st
 import joblib
 import pandas as pd
 
-# تحميل الموديل والميزان
-model = joblib.load('body_performance_model_compressed.pkl')
-scaler = joblib.load('scaler.pkl')
+# 1. إعدادات الصفحة (تغيير الأيقونة والعنوان في التاب)
+st.set_page_config(page_title="Fitness AI Pro", page_icon="💪", layout="centered")
 
-st.set_page_config(page_title="Body Performance AI", layout="wide")
+# 2. إضافة CSS مخصص لجعل الأزرار والخلفية أجمل
+st.markdown("""
+    <style>
+    .main { background-color: #f0f2f6; }
+    .stButton>button { width: 100%; border-radius: 20px; height: 3em; background-color: #ff4b4b; color: white; }
+    </style>
+    """, unsafe_allow_html=True)
+
+# 3. العنوان مع صورة أو أيقونة
 st.title("🏋️‍♂️ AI Body Performance Predictor")
-st.markdown("---")
+st.write("ادخل بياناتك البدنية وسيقوم الذكاء الاصطناعي بتحليل مستواك فوراً.")
 
-# تصميم الواجهة بشكل احترافي
+# 4. تقسيم المدخلات إلى أعمدة (Layout) بدلاً من قائمة طويلة
 col1, col2 = st.columns(2)
+
 with col1:
-    age = st.number_input("Age", 10, 80, 25)
-    gender = st.selectbox("Gender", [0, 1], format_func=lambda x: "Female" if x==0 else "Male")
-    height = st.number_input("Height (cm)", 120.0, 220.0, 175.0)
-    weight = st.number_input("Weight (kg)", 30.0, 150.0, 70.0)
+    age = st.number_input("العمر (Age)", 10, 80, 25)
+    height = st.number_input("الطول (cm)", 120, 220, 170)
+    weight = st.number_input("الوزن (kg)", 30, 200, 70)
+    body_fat = st.slider("نسبة الدهون (%)", 5.0, 50.0, 20.0)
+
 with col2:
-    fat = st.number_input("Body Fat %", 5.0, 50.0, 15.0)
-    sit_ups = st.number_input("Sit-ups Count", 0, 100, 40)
-    bend = st.number_input("Sit and Bend (cm)", -10.0, 40.0, 15.0)
-    jump = st.number_input("Broad Jump (cm)", 0.0, 350.0, 200.0)
+    grip_force = st.number_input("قوة القبضة (Grip Force)", 0.0, 100.0, 40.0)
+    sit_ups = st.number_input("عدات البطن (Sit-ups)", 0, 100, 30)
+    broad_jump = st.number_input("الوثب الطويل (cm)", 0, 300, 180)
+    # أضف بقية المدخلات هنا...
 
-if st.button("Analyze My Fitness", use_container_width=True):
-    bmi = weight / ((height / 100) ** 2)
-    # ترتيب الأعمدة الـ 12 كما في التدريب
-    input_data = pd.DataFrame([[age, gender, height, weight, fat, 80, 120, 45, bend, sit_ups, jump, bmi]],
-                              columns=['age', 'gender', 'height_cm', 'weight_kg', 'body fat_%',
-                                       'diastolic', 'systolic', 'gripForce', 'sit and bend forward_cm',
-                                       'sit-ups counts', 'broad jump_cm', 'BMI'])
-
-    scaled_data = scaler.transform(input_data)
-    prediction = model.predict(scaled_data)
-    classes = ['A (Excellent)', 'B (Good)', 'C (Average)', 'D (Poor)']
-
-    st.balloons()
-    st.markdown(f"### Result: **{classes[prediction[0]]}**")
+# 5. زر التحليل بتصميم بارز
+if st.button("Analyze My Fitness"):
+    # كود التوقع (نفس الكود القديم)
+    # ...
+    # عرض النتيجة بشكل جذاب
+    st.success(f"### Your Fitness Category is: {prediction}")
+    st.balloons() # إضافة تأثير احتفالي عند ظهور النتيجة
