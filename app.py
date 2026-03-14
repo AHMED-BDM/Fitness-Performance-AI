@@ -4,123 +4,104 @@ import pandas as pd
 import numpy as np
 
 # 1. إعدادات الصفحة
-st.set_page_config(page_title="BIO-TECH AI | Fitness Pro", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="Fitness AI Pro", page_icon="💪", layout="wide")
 
-# 2. تصميم CSS المتقدم (Cyberpunk Style)
+# 2. إضافة CSS مخصص لتغيير الخلفية والخطوط والألوان
 st.markdown("""
     <style>
+    /* تغيير خلفية التطبيق */
     .stApp {
-        background: radial-gradient(circle, #0d1117 0%, #010409 100%);
-        color: #e6edf3;
-    }
-    div[data-baseweb="input"], div[data-baseweb="select"], .stSlider {
-        background: rgba(255, 255, 255, 0.02) !important;
-        border: 1px solid #30363d !important;
-        border-radius: 8px !important;
-    }
-    h1 {
-        color: #58a6ff;
-        text-shadow: 0 0 15px rgba(88, 166, 255, 0.5);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .stButton > button {
-        background: linear-gradient(90deg, #238636, #2ea043);
+        background: linear-gradient(to right, #1e1e2f, #2d2d44);
         color: white;
-        border: none;
-        padding: 15px;
-        font-size: 18px;
-        font-weight: bold;
+    }
+    /* تنسيق كروت المدخلات */
+    .stNumberInput, .stSlider {
+        background-color: rgba(255, 255, 255, 0.05);
         border-radius: 10px;
+        padding: 10px;
+    }
+    /* تنسيق زر التحليل */
+    div.stButton > button:first-child {
+        background-color: #ff4b4b;
+        color: white;
+        border-radius: 20px;
+        height: 3em;
         width: 100%;
-        box-shadow: 0 0 10px rgba(46, 160, 67, 0.4);
+        font-weight: bold;
+        border: none;
         transition: 0.3s;
     }
-    .stButton > button:hover {
-        box-shadow: 0 0 20px rgba(46, 160, 67, 0.6);
-        transform: translateY(-2px);
+    div.stButton > button:first-child:hover {
+        background-color: #ff2b2b;
+        transform: scale(1.02);
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. تحميل الموديل والسكيلر
+# تحميل الموديل والسكيلر
 @st.cache_resource
 def load_assets():
     model = joblib.load('body_performance_model_compressed.pkl')
     scaler = joblib.load('scaler.pkl')
     return model, scaler
 
-try:
-    model, scaler = load_assets()
-except Exception as e:
-    st.error(f"Error loading model assets: {e}")
+model, scaler = load_assets()
 
-# 4. واجهة المستخدم (Input Form)
-st.markdown("<h1 style='text-align: center;'>🧬 NEURAL FITNESS ANALYZER</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #8b949e;'>AI-Powered Body Performance Classification</p>", unsafe_allow_html=True)
+# العنوان الرئيسي
+st.title("🏋️‍♂️ AI Body Performance Analyzer")
 st.markdown("---")
 
-col1, col2, col3 = st.columns(3, gap="large")
+# 3. تنظيم المدخلات في أعمدة (Layout)
+col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.markdown("### 👤 Bio-Data")
+    st.subheader("👤 Personal Info")
     age = st.number_input("Age", 10, 80, 25)
     gender = st.selectbox("Gender", ["Male", "Female"])
-    height = st.number_input("Height (cm)", 120.0, 220.0, 175.0)
-    weight = st.number_input("Weight (kg)", 30.0, 200.0, 75.0)
+    height = st.number_input("Height (cm)", 120, 220, 170)
+    weight = st.number_input("Weight (kg)", 30, 200, 70)
 
 with col2:
-    st.markdown("### 🩺 Vitals")
-    body_fat = st.slider("Body Fat %", 5.0, 50.0, 18.0)
-    dia_bp = st.number_input("Diastolic BP", 40, 120, 80)
-    sys_bp = st.number_input("Systolic BP", 80, 200, 120)
-    grip = st.number_input("Grip Force", 0.0, 100.0, 45.0)
+    st.subheader("📊 Measurements")
+    body_fat = st.slider("Body Fat %", 5.0, 50.0, 20.0)
+    diastolic = st.number_input("Diastolic BP", 40, 120, 80)
+    systolic = st.number_input("Systolic BP", 80, 200, 120)
+    grip_force = st.number_input("Grip Force", 0.0, 100.0, 40.0)
 
 with col3:
-    st.markdown("### ⚡ Performance")
-    sit_bend = st.number_input("Sit & Bend (cm)", -20.0, 50.0, 15.0)
-    sit_ups = st.number_input("Sit-ups Count", 0, 100, 40)
-    jump = st.number_input("Broad Jump (cm)", 0, 300, 210)
+    st.subheader("🏃 Performance")
+    sit_ups = st.number_input("Sit-ups Count", 0, 100, 30)
+    broad_jump = st.number_input("Broad Jump (cm)", 0, 300, 180)
+    sit_bend = st.number_input("Sit & Bend forward (cm)", -20.0, 50.0, 15.0)
+    running_400m = st.number_input("400m Run (sec)", 30.0, 200.0, 70.0)
 
-st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("---")
 
-# 5. التوقع (Prediction Logic)
-if st.button("EXECUTE ANALYSIS"):
-    # تحويل الجنس لرقم
-    g_val = 0 if gender == "Male" else 1
+# 4. المعالجة والتوقع
+gender_val = 0 if gender == "Male" else 1
+
+if st.button("🚀 Analyze My Performance"):
+    # تجهيز البيانات بنفس ترتيب التدريب
+    features = np.array([[age, gender_val, height, weight, body_fat, diastolic, 
+                          systolic, grip_force, sit_bend, sit_ups, broad_jump]])
     
-    # حساب العمود الـ 12 (BMI) - تأكد أنه هو العمود المطلوب في كولاب
-    bmi = weight / ((height / 100) ** 2)
+    # التحجيم
+    features_scaled = scaler.transform(features)
     
-    # تجميع البيانات بنفس ترتيب كولاب (12 عمود)
-    # ملاحظة: الترتيب هنا حيوي جداً لنجاح التوقع
-    input_data = np.array([[
-        age, g_val, height, weight, body_fat, 
-        dia_bp, sys_bp, grip, sit_bend, sit_ups, jump, bmi
-    ]])
+    # التوقع
+    prediction = model.predict(features_scaled)[0]
     
-    # تنفيذ التحجيم والتوقع
-    try:
-        input_scaled = scaler.transform(input_data)
-        prediction = model.predict(input_scaled)[0]
-        
-        # عرض النتيجة
-        st.markdown("---")
-        colors = {"A": "#238636", "B": "#1f6feb", "C": "#d29922", "D": "#f85149"}
-        res_color = colors.get(prediction, "#ffffff")
-        
-        st.markdown(f"""
-            <div style="border: 1px solid {res_color}; padding: 30px; border-radius: 15px; text-align: center; background: rgba(0,0,0,0.2);">
-                <h2 style="color: #8b949e; margin-bottom: 5px;">CLASSIFICATION RESULT</h2>
-                <h1 style="font-size: 100px; color: {res_color}; margin: 0; padding: 0;">{prediction}</h1>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        if prediction == "A":
-            st.balloons()
-            st.success("Performance Status: ELITE")
-        elif prediction == "D":
-            st.warning("Performance Status: NEEDS IMPROVEMENT")
-            
-    except ValueError as e:
-        st.error(f"Input dimension mismatch: {e}")
-        st.info("Check if your model expects 12 features including BMI.")
+    # عرض النتيجة بشكل مبهر
+    st.markdown(f"<h2 style='text-align: center;'>Your Fitness Class is:</h2>", unsafe_allow_html=True)
+    
+    # تلوين النتيجة حسب الفئة
+    colors = {"A": "#28a745", "B": "#ffc107", "C": "#fd7e14", "D": "#dc3545"}
+    res_color = colors.get(prediction, "#ffffff")
+    
+    st.markdown(f"<h1 style='text-align: center; color: {res_color}; font-size: 80px;'>{prediction}</h1>", unsafe_allow_html=True)
+    
+    if prediction == "A":
+        st.balloons()
+        st.success("Excellent! You are in peak physical condition.")
+    elif prediction == "B":
+        st.info("Great job! You are above average.")
